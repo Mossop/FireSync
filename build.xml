@@ -31,6 +31,14 @@
 		<property name="homedir" value="${user.home}/My Documents"/>
 	</target>
 
+	<target name="commit" depends="setup" description="Commits changes to cvs">
+		<cvs command="commit"/>
+	</target>
+	
+	<target name="update" depends="setup" description="Updates changes from cvs">
+		<cvs command="update"/>
+	</target>
+	
 	<target name="fixcrlf" depends="setup" description="Fixes crlfs in source files">
 		<fixcrlf srcdir="${sourcedir}" includes="/**/*"/>
 	</target>
