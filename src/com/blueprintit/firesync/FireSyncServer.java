@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.net.InetSocketAddress;
 import java.util.Iterator;
+import com.blueprintit.firesync.server.HandshakeProtocol;
 
 public class FireSyncServer implements Runnable
 {
@@ -51,6 +52,15 @@ public class FireSyncServer implements Runnable
 		}
 		while (!shutdown)
 		{
+			try
+			{
+				selector.select();
+			}
+			catch (Exception e)
+			{
+				System.err.println("Error selecting events - "+e.getMessage());
+				e.printStackTrace();
+			}
 			Iterator i = selector.selectedKeys().iterator();
 			while (i.hasNext())
 			{
@@ -64,13 +74,17 @@ public class FireSyncServer implements Runnable
 						System.out.println("Connection accepted");
 						try
 						{
+							socket.configureBlocking(false);
 							socket.register(selector,OP_READ);
 							ConnectionHandler handler = new ConnectionHandler(socket);
 							handlers.put(socket,handler);
+							HandshakeProtocol handshake = new HandshakeProtocol();
+							handler.setDataHandler(handshake);
 						}
 						catch (Exception e)
 						{
 							System.err.println("Error registering socket - "+e.getMessage());
+							e.printStackTrace();
 						}
 					}
 					catch (Exception e)
@@ -99,12 +113,15 @@ public class FireSyncServer implements Runnable
 					}
 					else
 					{
+						System.err.println("Client disconnected");
 						handlers.get((SocketChannel)sel.channel()).connectionClosed();
+						sel.cancel();
 					}
 					selector.selectedKeys().remove(sel);
 				}
 			}
 		}
+		System.out.println("Stopped listening");
 	}
 	
 	public void stop()

@@ -17,6 +17,7 @@ public class ConnectionHandler
 	
 	public ConnectionHandler(SocketChannel channel)
 	{
+		socket=channel;
 	}
 	
 	public void makeSecure() throws GeneralSecurityException
@@ -37,6 +38,18 @@ public class ConnectionHandler
 	public void sendData(ByteBuffer buffer) throws IOException
 	{
 		socket.write(buffer);
+	}
+	
+	public void closeConnection()
+	{
+		try
+		{
+			System.out.println("Closing connection");
+			socket.close();
+		}
+		catch (Exception e)
+		{
+		}
 	}
 	
 	public void dataReceived(ByteBuffer buffer)

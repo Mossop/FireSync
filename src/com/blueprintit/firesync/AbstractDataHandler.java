@@ -15,7 +15,15 @@ public abstract class AbstractDataHandler implements DataHandler
 	public void registerConnection(ConnectionHandler handler)
 	{
 		connection=handler;
+		startProtocol();
 	}
+	
+	public void closeConnection()
+	{
+		connection.closeConnection();
+	}
+	
+	public abstract void startProtocol();
 	
 	public abstract void dataReceived(ByteBuffer buffer);
 	
