@@ -18,10 +18,11 @@ public class ConnectionHandler
 	private DataHandler handler;
 	SSLEngine ssl = null;
 	
-	public ConnectionHandler(SocketChannel channel)
+	public ConnectionHandler(SocketChannel channel, DataHandler handler)
 	{
 		databuffer = ByteBuffer.allocate(1024);
 		socket=channel;
+		setDataHandler(handler);
 	}
 	
 	public void makeSecure() throws GeneralSecurityException
@@ -30,10 +31,11 @@ public class ConnectionHandler
 		{
 			ssl = SSLContext.getInstance("SSL").createSSLEngine();
 			sslbuffer = ByteBuffer.allocateDirect(ssl.getSession().getPacketBufferSize());
+			databuffer = ByteBuffer.allocateDirect(ssl.getSession().getApplicationBufferSize());
 		}
 	}
 	
-	public void setDataHandler(DataHandler handler)
+	private void setDataHandler(DataHandler handler)
 	{
 		this.handler = handler;
 		handler.registerConnection(this);
@@ -77,20 +79,8 @@ public class ConnectionHandler
 	
 	private void sendData()
 	{
-		if (handler!=null)
-		{
-			handler.dataReceived(databuffer);
-			if (databuffer.hasRemaining())
-			{
-				ByteBuffer newbuffer = ByteBuffer.allocate(1024);
-				newbuffer.put(databuffer);
-				databuffer = newbuffer;
-			}
-			else
-			{
-				databuffer.clear();
-			}
-		}
+		handler.dataReceived(databuffer);
+		databuffer.clear();
 	}
 	
 	public boolean attemptRead(ByteBuffer buffer)
@@ -135,6 +125,7 @@ public class ConnectionHandler
 					{
 						ByteBuffer newssl = ByteBuffer.allocate(ssl.getSession().getPacketBufferSize());
 						newssl.put(sslbuffer);
+						sslbuffer=newssl;
 					}
 					else
 					{
@@ -143,7 +134,7 @@ public class ConnectionHandler
 					if (result.getHandshakeStatus()==NEED_WRAP)
 					{
 						ByteBuffer blank = ByteBuffer.allocate(1);
-						blank.flip();
+						blank.limit(0);
 						sendData(blank);
 					}
 				}
@@ -171,5 +162,10 @@ public class ConnectionHandler
 		{
 			handler.connectionClosed();
 		}
+		try
+		{
+			socket.close();
+		}
+		catch (Exception e) {}
 	}
 }

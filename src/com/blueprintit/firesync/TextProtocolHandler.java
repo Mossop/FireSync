@@ -7,7 +7,6 @@ public abstract class TextProtocolHandler extends AbstractDataHandler
 {
 	private ByteBuffer sendbuffer = ByteBuffer.allocateDirect(1024);
 	private StringBuilder readbuffer = new StringBuilder();
-	private byte[] inputbuffer = new byte[1024];
 	
 	public void sendLine(String text)
 	{
@@ -32,22 +31,21 @@ public abstract class TextProtocolHandler extends AbstractDataHandler
 	
 	public void dataReceived(ByteBuffer buffer)
 	{
-		int stpos = buffer.position();
-		StringBuilder builder = new StringBuilder();
 		while (buffer.hasRemaining())
 		{
 			String bit = new String(new byte[] {buffer.get()});
-			if (bit.charAt(0)=='\n')
+			if (bit.charAt(0)=='\r')
 			{
-				lineReceived(builder.toString());
-				builder.delete(0,builder.length());
-				stpos = buffer.position();
+			}
+			else if (bit.charAt(0)=='\n')
+			{
+				lineReceived(readbuffer.toString());
+				readbuffer.delete(0,readbuffer.length());
 			}
 			else
 			{
-				builder.append(bit.charAt(0));
+				readbuffer.append(bit);
 			}
 		}
-		buffer.position(stpos);
 	}
 }

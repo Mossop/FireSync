@@ -76,10 +76,9 @@ public class FireSyncServer implements Runnable
 						{
 							socket.configureBlocking(false);
 							socket.register(selector,OP_READ);
-							ConnectionHandler handler = new ConnectionHandler(socket);
-							handlers.put(socket,handler);
 							HandshakeProtocol handshake = new HandshakeProtocol();
-							handler.setDataHandler(handshake);
+							ConnectionHandler handler = new ConnectionHandler(socket,handshake);
+							handlers.put(socket,handler);
 						}
 						catch (Exception e)
 						{
