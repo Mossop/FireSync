@@ -15,17 +15,6 @@ public abstract class ThreadedDataHandler extends AbstractDataHandler implements
 		connection.sendData(buffer);
 	}
 	
-	public void registerConnection(ConnectionHandler handler)
-	{
-		connection=handler;
-		startProtocol();
-	}
-	
-	public void closeConnection()
-	{
-		connection.closeConnection();
-	}
-	
 	public void startProtocol()
 	{
 		pipe = new PipedOutputStream();

@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public abstract class AbstractDataHandler implements DataHandler
 {
-	private ConnectionHandler connection;
+	protected ConnectionHandler connection;
 	
 	public void sendData(ByteBuffer buffer)
 	{
