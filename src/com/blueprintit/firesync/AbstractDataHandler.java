@@ -7,7 +7,7 @@ public abstract class AbstractDataHandler implements DataHandler
 {
 	private ConnectionHandler connection;
 	
-	public void sendData(ByteBuffer buffer) throws IOException
+	public void sendData(ByteBuffer buffer)
 	{
 		connection.sendData(buffer);
 	}

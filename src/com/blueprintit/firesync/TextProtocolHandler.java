@@ -9,7 +9,7 @@ public abstract class TextProtocolHandler extends AbstractDataHandler
 	private StringBuilder readbuffer = new StringBuilder();
 	private byte[] inputbuffer = new byte[1024];
 	
-	public void sendLine(String text) throws IOException
+	public void sendLine(String text)
 	{
 		if (!text.endsWith("\n"))
 		{
