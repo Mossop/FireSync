@@ -32,19 +32,22 @@ public abstract class TextProtocolHandler extends AbstractDataHandler
 	
 	public void dataReceived(ByteBuffer buffer)
 	{
-		while (buffer.remaining()>0)
+		int stpos = buffer.position();
+		StringBuilder builder = new StringBuilder();
+		while (buffer.hasRemaining())
 		{
-			int len = Math.min(buffer.remaining(),inputbuffer.length);
-			buffer.get(inputbuffer,0,Math.min(inputbuffer.length,buffer.remaining()));
-			readbuffer.append(new String(inputbuffer,0,len));
+			String bit = new String(new byte[] {buffer.get()});
+			if (bit.charAt(0)=='\n')
+			{
+				lineReceived(builder.toString());
+				builder.delete(0,builder.length());
+				stpos = buffer.position();
+			}
+			else
+			{
+				builder.append(bit.charAt(0));
+			}
 		}
-		int pos = readbuffer.indexOf("\n");
-		while (pos>=0)
-		{
-			String line = readbuffer.substring(0,pos);
-			lineReceived(line);
-			readbuffer.delete(0,pos+1);
-			pos=readbuffer.indexOf("\n");
-		}
+		buffer.position(stpos);
 	}
 }

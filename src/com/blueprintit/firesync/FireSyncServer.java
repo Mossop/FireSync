@@ -96,27 +96,7 @@ public class FireSyncServer implements Runnable
 				else if (sel.isReadable())
 				{
 					assert sel.channel() instanceof SocketChannel;
-					int count;
-					try
-					{
-						count = ((SocketChannel)sel.channel()).read(buffer);
-					}
-					catch (Exception e)
-					{
-						count=-1;
-					}
-					if (count>0)
-					{
-						buffer.flip();
-						handlers.get((SocketChannel)sel.channel()).dataReceived(buffer);
-						buffer.clear();
-					}
-					else
-					{
-						System.err.println("Client disconnected");
-						handlers.get((SocketChannel)sel.channel()).connectionClosed();
-						sel.cancel();
-					}
+					handlers.get((SocketChannel)sel.channel()).dataReceived();
 					selector.selectedKeys().remove(sel);
 				}
 			}
